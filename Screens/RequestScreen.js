@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, FlatList } from "react-native";
 
-export default function RequestScreen() {
+export default function RequestScreen({ navigation }) {
   const [filtro, setFiltro] = useState("Todas");
 
   const peticiones = [
@@ -37,11 +37,10 @@ export default function RequestScreen() {
   };
 
   return (
-    <ImageBackground
-      source={require("../assets/BG1.png")}
-      style={styles.background}
-      resizeMode='cover'
-    >
+    <View style={styles.background}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>Opina +</Text>
+      </View>
     <View style={styles.container}>
       <Text style={styles.title}>Mis Solicitudes</Text>
 
@@ -68,20 +67,39 @@ export default function RequestScreen() {
         }
       />
     </View>
-    </ImageBackground>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-
+    headerContainer: {
+        width: '100%',
+        padding: 20,
+        paddingTop: 40,
+        alignItems: 'center',
+    },
+    headerText: {
+        fontSize: 36,
+        fontWeight: "bold",
+        color: "#2701A9",
+    },
     container: {
-        backgroundColor: '#4a4a4a52',
+        backgroundColor: '#ffffff',
         width: '80%',
         padding: 20,
         borderRadius: 10,
+        elevation: 10,
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.5,
+        shadowRadius: 5,
     },
     background: {
         flex: 1,
+        backgroundColor: '#ffffff',
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
@@ -90,7 +108,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 26,
         fontWeight: "bold",
-        color: "#5170ff",
+        color: "#2701A9",
         marginBottom: 10,
     },
     filtros: {
@@ -100,29 +118,30 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
     },
     filterBtn: {
-        paddingVertical: 6,
-        paddingHorizontal: 12,
-        backgroundColor: "#1a1a1a",
-        borderRadius: 8,
+        paddingVertical: 8,
+        paddingHorizontal: 8,
+        backgroundColor: "#D9D9D9",
+        borderRadius: 30,
         marginVertical: 4,
     },
     filterActive: {
-      backgroundColor: "#5170ff",
+      backgroundColor: "#2701A9",
     },
     filterText: {
-        color: "#fff",
+        color: "#000000",
         fontSize: 12,
+        fontWeight: "bold",
     },
     card: {
-        backgroundColor: "#111",
+        backgroundColor: "#D9D9D9",
         padding: 15,
         borderRadius: 10,
         marginBottom: 10,
-        borderWidth: 1,
-        borderColor: "#222",
+        borderWidth: 2,
+        borderColor: "#ffffff81",
     },
     titulo: {
-        color: "#fff",
+        color: "#000000",
         fontSize: 16,
         fontWeight: "bold",
     },
@@ -132,7 +151,7 @@ const styles = StyleSheet.create({
         marginTop: 6,
     },
     fecha: {
-        color: "#aaa",
+        color: "#666",
         fontSize: 12,
     },
     estado: {
@@ -140,7 +159,7 @@ const styles = StyleSheet.create({
         fontSize: 13,
     },
     empty: {
-        color: "#999",
+        color: "#666",
         textAlign: "center",
         marginTop: 30,
     },

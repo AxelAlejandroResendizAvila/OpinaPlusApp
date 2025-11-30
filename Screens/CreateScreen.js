@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ImageBackground, Alert } from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from "react-native";
 
-export default function CreateScreen() {
+export default function CreateScreen({ navigation }) {
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [categoria, setCategoria] = useState("");
@@ -13,10 +13,18 @@ export default function CreateScreen() {
       return;
     }
 
-    Alert.alert(
-      "Solicitud enviada ✅",
-      `Título: ${titulo}\nDescripción: ${descripcion}\nCategoría: ${categoria}\nAdjunto: ${adjunto || "Sin adjunto"}`
-    );
+    if (navigation) {
+      Alert.alert(
+        "Solicitud enviada ✅",
+        `Título: ${titulo}\nCategoría: ${categoria}`,
+        [{ text: "OK", onPress: () => navigation.goBack() }]
+      );
+    } else {
+      Alert.alert(
+        "Solicitud enviada ✅",
+        `Título: ${titulo}\nDescripción: ${descripcion}\nCategoría: ${categoria}\nAdjunto: ${adjunto || "Sin adjunto"}`
+      );
+    }
 
     setTitulo("");
     setDescripcion("");
@@ -25,106 +33,127 @@ export default function CreateScreen() {
   };
 
   return (
-    <ImageBackground
-       source={require("../assets/BG2.png")}
-       resizeMode='cover'
-       style={styles.background}
-    >
-    <View style={styles.container}>
-      <Text style={styles.title}>Nueva Solicitud / Queja</Text>
+    <View style={styles.background}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>Opina +</Text>
+      </View>
+      <View style={styles.container}>
+        <Text style={styles.title}>Crear Petición</Text>
 
-      <Text style={styles.label}>Título *</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Título de la solicitud"
-        placeholderTextColor="#999"
-        value={titulo}
-        onChangeText={setTitulo}
-      />
+        <Text style={styles.label}>Título *</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Título de la solicitud"
+          placeholderTextColor="#999"
+          value={titulo}
+          onChangeText={setTitulo}
+        />
 
-      <Text style={styles.label}>Descripción *</Text>
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Describe tu situación..."
-        placeholderTextColor="#999"
-        multiline
-        value={descripcion}
-        onChangeText={setDescripcion}
-      />
+        <Text style={styles.label}>Descripción *</Text>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          placeholder="Describe tu situación..."
+          placeholderTextColor="#999"
+          multiline
+          value={descripcion}
+          onChangeText={setDescripcion}
+        />
 
-      <Text style={styles.label}>Categoría *</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Ej: Profesor, Instalaciones, Servicios..."
-        placeholderTextColor="#999"
-        value={categoria}
-        onChangeText={setCategoria}
-      />
+        <Text style={styles.label}>Categoría *</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Ej: Profesor, Instalaciones, Servicios..."
+          placeholderTextColor="#999"
+          value={categoria}
+          onChangeText={setCategoria}
+        />
 
-      <Text style={styles.label}>Adjunto (opcional)</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Escribe el nombre del archivo o enlace"
-        placeholderTextColor="#999"
-        value={adjunto}
-        onChangeText={setAdjunto}
-      />
+        <Text style={styles.label}>Adjunto (opcional)</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Escribe el nombre del archivo o enlace"
+          placeholderTextColor="#999"
+          value={adjunto}
+          onChangeText={setAdjunto}
+        />
 
-      <TouchableOpacity style={styles.btn} onPress={enviarPeticion}>
-        <Text style={styles.btnText}>Enviar Petición</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.btn} onPress={enviarPeticion}>
+          <Text style={styles.btnText}>Enviar</Text>
+        </TouchableOpacity>
+      </View>
     </View>
-    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    width: '80%',
+    padding: 20,
+   
+  },
+  headerText: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: "#2701A9",
+    marginBottom: 20,
+  },
   container: {
-    backgroundColor: '#4a4a4a52',
+    backgroundColor: '#ffffff',
     width: '80%',
     padding: 20,
     borderRadius: 10,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
   },
     background: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
+    justifyContent: 'center', 
     width: '100%',
     height: '100%',
   },
   title: {
     fontSize: 26,
     fontWeight: "bold",
-    color: "#5170ff",
+    color: "#2701A9",
     marginBottom: 20,
   },
   label: {
-    color: "#fff",
+    color: "#000000",
+    fontSize: 16,
+    fontWeight: "bold",
     marginBottom: 4,
     marginTop: 12,
   },
   input: {
-    backgroundColor: "#1a1a1a",
-    color: "#fff",
-    borderWidth: 1,
-    borderColor: "#444",
+    backgroundColor: "#D9D9D9",
+    borderWidth: 2,
+    borderColor: "#ffffff81",
     borderRadius: 8,
     padding: 10,
+    color: "#000000",
   },
   textArea: {
     height: 120,
     textAlignVertical: "top",
   },
   btn: {
-    backgroundColor: "#5170ff",
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: "#2701A9",
+    padding: 14,
+    borderRadius: 30,
     marginTop: 25,
   },
   btnText: {
     color: "#fff",
     textAlign: "center",
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 18,
   },
 });

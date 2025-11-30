@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, ImageBackground, ScrollView } from "react-native";
 
-export default function HomeAdminScreen() {
+export default function HomeAdminScreen({ navigation }) {
   
   // Datos simulados
   const total = 120;
@@ -22,13 +22,15 @@ export default function HomeAdminScreen() {
   );
 
   return (
-    
-    <View style={styles.container}>
-    <ScrollView 
-      showsVerticalScrollIndicator={false}
-    
-    >
-      <Text style={styles.titulo}>Dashboard Administrador</Text>
+    <View style={styles.background}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>Opina +</Text>
+      </View>
+      <View style={styles.container}>
+        <ScrollView 
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.titulo}>Dashboard Administrador</Text>
 
       {/* KPIs */}
       <View style={styles.cardRow}>
@@ -84,26 +86,35 @@ export default function HomeAdminScreen() {
         <Text style={styles.mlTitulo}> Análisis de Sentimiento</Text>
         <Text style={styles.mlTexto}>Clasificación automática del sentimiento del alumno: positivo, neutral, negativo.</Text>
       </View>
-    </ScrollView>
+        </ScrollView>
+      </View>
     </View>
-   
-    
-    
   );
 }
 
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    
+    backgroundColor: '#ffffff',
+  },
+  headerContainer: {
+    width: '100%',
+    padding: 20,
+    paddingTop: 40,
+    alignItems: 'center',
+  },
+  headerText: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: "#2701A9",
   },
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#ffffff",
     padding: 15,
   },
   titulo: {
-    color: "#5170ff",
+    color: "#2701A9",
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 15,
@@ -114,49 +125,55 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   card: {
-    backgroundColor: "#1a1a1a",
+    backgroundColor: "#D9D9D9",
     width: "48%",
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
+    borderWidth: 2,
+    borderColor: "#ffffff81",
   },
   cardLarge: {
-    backgroundColor: "#1a1a1a",
+    backgroundColor: "#D9D9D9",
     width: "100%",
     padding: 15,
     borderRadius: 10,
     marginVertical: 10,
+    borderWidth: 2,
+    borderColor: "#ffffff81",
   },
   num: {
-    color: "#fff",
+    color: "#2701A9",
     fontSize: 28,
     fontWeight: "bold",
     textAlign: "center",
   },
   label: {
-    color: "#aaa",
+    color: "#000000",
     fontSize: 12,
     textAlign: "center",
     marginTop: 5,
   },
   subtitle: {
-    color: "#fff",
+    color: "#2701A9",
     fontSize: 18,
     marginTop: 18,
     marginBottom: 8,
     fontWeight: "bold",
   },
   chartLabel: {
-    color: "#aaa",
+    color: "#000000",
     fontSize: 13,
     marginTop: 8,
   },
   barraCont: {
     height: 20,
-    backgroundColor: "#222",
+    backgroundColor: "#D9D9D9",
     borderRadius: 8,
     marginVertical: 4,
     justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#ffffff81",
   },
   barra: {
     height: "100%",
@@ -165,25 +182,28 @@ const styles = StyleSheet.create({
   barraTexto: {
     position: "absolute",
     alignSelf: "center",
-    color: "#fff",
+    color: "#000000",
     fontSize: 11,
+    fontWeight: "bold",
   },
   cardML: {
-    backgroundColor: "#161616",
+    backgroundColor: "#D9D9D9",
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
     borderLeftWidth: 3,
-    borderLeftColor: "#5170ff",
+    borderLeftColor: "#2701A9",
+    borderWidth: 2,
+    borderColor: "#ffffff81",
   },
   mlTitulo: {
-    color: "#5170ff",
+    color: "#2701A9",
     fontSize: 15,
     fontWeight: "bold",
     marginBottom: 4,
   },
   mlTexto: {
-    color: "#ccc",
+    color: "#000000",
     fontSize: 13,
   },
 });

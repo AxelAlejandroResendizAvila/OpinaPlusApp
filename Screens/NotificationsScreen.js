@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView, ImageBackground, TouchableOpacity } from "react-native";
 
-export default function NotificationsScreen() {
+export default function NotificationsScreen({ navigation }) {
   
   // Cambiar entre alumno/moderador para pruebas
   const rol = "alumno"; // "moderador" o "alumno"
@@ -36,11 +36,10 @@ export default function NotificationsScreen() {
   ];
 
   return (
-    <ImageBackground
-      source={require("../assets/BG1.png")}
-      resizeMode='cover'
-      style={styles.background}
-    >
+    <View style={styles.background}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>Opina +</Text>
+      </View>
     <View style={styles.container}>
       <Text style={styles.title}>Notificaciones</Text>
       <ScrollView>
@@ -62,62 +61,83 @@ export default function NotificationsScreen() {
 
       </ScrollView>
     </View>
-    </ImageBackground>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+    headerContainer: {
+        width: '100%',
+        padding: 20,
+        paddingTop: 40,
+        alignItems: 'center',
+    },
+    headerText: {
+        fontSize: 36,
+        fontWeight: "bold",
+        color: "#2701A9",
+    },
     container: {
-        backgroundColor: '#4a4a4a52',
+        backgroundColor: '#ffffff',
         width: '80%',
         padding: 20,
         borderRadius: 10,
+        elevation: 10,
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.5,
+        shadowRadius: 5,
     },
     background: {
         flex: 1,
+        backgroundColor: '#ffffff',
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
         height: '100%',
     },
   title: {
-    color: "#5170ff",
+    color: "#2701A9",
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 12,
   },
   card: {
-    backgroundColor: "#151515",
+    backgroundColor: "#D9D9D9",
     padding: 14,
     borderRadius: 10,
     marginBottom: 12,
     borderLeftWidth: 3,
-    borderLeftColor: "#5170ff",
+    borderLeftColor: "#2701A9",
   },
   msg: {
-    color: "#fff",
+    color: "#000000",
     fontSize: 15,
     marginBottom: 6,
+    fontWeight: "bold",
   },
   estado: {
-    color: "#bbb",
+    color: "#000000",
     fontSize: 13,
     marginBottom: 4,
   },
   bold: {
-    color: "#fff",
+    color: "#2701A9",
     fontWeight: "bold",
   },
   fecha: {
-    color: "#888",
+    color: "#666",
     fontSize: 12,
     marginBottom: 10,
   },
   btn: {
-    backgroundColor: "#5170ff",
-    padding: 8,
-    borderRadius: 8,
+    backgroundColor: "#2701A9",
+    padding: 10,
+    borderRadius: 30,
   },
   btnText: {
     color: "#fff",

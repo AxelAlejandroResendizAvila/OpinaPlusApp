@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, FlatList, ImageBackground, TouchableOpacity } from "react-native";
 
-export default function ModScreen() {
+export default function ModScreen({ navigation }) {
   const [filtro, setFiltro] = useState("pendiente");
 
   const peticiones = [
@@ -40,11 +40,10 @@ export default function ModScreen() {
   );
 
   return (
-    <ImageBackground
-      source={require("../assets/BG2.png")}
-      resizeMode='cover'
-      style={styles.background}
-      >
+    <View style={styles.background}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>Opina +</Text>
+      </View>
         <View style={styles.container}>
       <Text style={styles.header}>Bandeja del Moderador</Text>
 
@@ -68,28 +67,48 @@ export default function ModScreen() {
         renderItem={renderItem}
       />
     </View>
-    </ImageBackground>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+    headerContainer: {
+        width: '100%',
+        padding: 20,
+        paddingTop: 40,
+        alignItems: 'center',
+    },
+    headerText: {
+        fontSize: 36,
+        fontWeight: "bold",
+        color: "#2701A9",
+    },
     background: {
     flex: 1,
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
     height: '100%',
   },
   container: {
-    backgroundColor: '#4a4a4a52',
+    backgroundColor: '#ffffff',
     width: '80%',
     padding: 20,
     borderRadius: 10,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
   },
   header: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#5170ff",
+    color: "#2701A9",
     marginBottom: 15,
   },
   filtros: {
@@ -98,30 +117,32 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   filtro: {
-    color: "#aaa",
+    color: "#666",
     fontSize: 14,
     paddingVertical: 6,
   },
   filtroActivo: {
-    color: "#fff",
+    color: "#2701A9",
     fontWeight: "bold",
     borderBottomWidth: 2,
-    borderColor: "#5170ff",
+    borderColor: "#2701A9",
   },
   card: {
-    backgroundColor: "#1b1b1b",
+    backgroundColor: "#D9D9D9",
     borderRadius: 10,
     padding: 12,
     marginBottom: 12,
+    borderWidth: 2,
+    borderColor: "#ffffff81",
   },
   titulo: {
-    color: "#fff",
+    color: "#000000",
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 5,
   },
   detalle: {
-    color: "#ccc",
+    color: "#000000",
     fontSize: 13,
   },
   estado: {
@@ -149,16 +170,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   btn: {
-    backgroundColor: "#5170ff",
+    backgroundColor: "#2701A9",
     padding: 10,
-    borderRadius: 8,
+    borderRadius: 30,
     width: "48%",
     alignItems: "center",
   },
   btnReasignar: {
     backgroundColor: "#e63946",
     padding: 10,
-    borderRadius: 8,
+    borderRadius: 30,
     width: "48%",
     alignItems: "center",
   },

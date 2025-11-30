@@ -1,14 +1,10 @@
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Animated } from "react-native";
-import React, { useState, useEffect, useRef } from "react";
-import CreateScreen from "./CreateScreen";
-import RequestScreen from "./RequestScreen";
-import DetailsScreen from "./DetailsScreen";
-import NotificationsScreen from "./NotificationsScreen";
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { Ionicons } from '@expo/vector-icons';
 
-export default function HomeUserScreen() {
+export default function HomeUserScreen({ navigation }) {
 
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
-  const [screen, setScreen] = useState(null);
 
   useEffect(() => {
     Animated.spring(scaleAnim, {
@@ -18,86 +14,61 @@ export default function HomeUserScreen() {
     }).start();
   }, []);
 
-  // Navegación por estados
-  switch (screen) {
-
-    case "Create":
-      return <CreateScreen />;
-
-    case "Request":
-      return <RequestScreen />;
-
-    case "Details":
-      return <DetailsScreen />;
-
-    case "Notifications":
-      return <NotificationsScreen />;
-
-    default:
-      return (
-        <ImageBackground
-          source={require("../assets/BG2.png")}
+  return (
+        <View
           style={styles.container}
         >
-          <Text style={styles.titulo}>Bienvenido</Text>
+          <View style={styles.headerContainer}>
+                  <Text style={styles.headerText}>Opina +</Text>
+                </View>
+          <Text style={styles.titulo}>Bienvenido, Daniel</Text>
 
           <Animated.View style={[styles.cardsContainer, { transform: [{ scale: scaleAnim }] }]}>
-            <View style={styles.card}>
+            <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Request')}>
+              <Ionicons name="folder-open" size={40} color="#5170ff" />
               <Text style={styles.subtitulo}>Peticiones Abiertas</Text>
               <Text style={styles.numero}>4</Text>
-            </View>
+            </TouchableOpacity>
 
-            <View style={styles.card}>
+            <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Request')}>
+              <Ionicons name="checkmark-circle" size={40} color="#2cbb77" />
               <Text style={styles.subtitulo}>Peticiones Resueltas</Text>
               <Text style={styles.numero}>12</Text>
-            </View>
+            </TouchableOpacity>
           </Animated.View>
 
           <TouchableOpacity
             style={styles.btnPrincipal}
-            onPress={() => setScreen("Create")}
+            onPress={() => navigation.navigate("Create")}
           >
-            <Text style={styles.btnText}>+ Crear Nueva Petición</Text>
+            <Text style={styles.btnText}>+ Crear Petición</Text>
           </TouchableOpacity>
-
-          <View style={styles.accesos}>
-            <TouchableOpacity
-              style={styles.btnAcceso}
-              onPress={() => setScreen("Request")}
-            >
-              <Text style={styles.accesoText}>📋 Ver mis peticiones</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.btnAcceso}
-              onPress={() => setScreen("Details")}
-            >
-              <Text style={styles.accesoText}>📄 Ver detalle de petición</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.btnAcceso}
-              onPress={() => setScreen("Notifications")}
-            >
-              <Text style={styles.accesoText}>🔔 Notificaciones</Text>
-            </TouchableOpacity>
-          </View>
-        </ImageBackground>
+        </View>
       );
-  }
 }
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    width: '80%',
+    paddingBottom: 20,
+   
+  },
+  headerText: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: "#2701A9",
+    
+  },
   container: {
     flex: 1,
-    backgroundColor: "#1b1b1bd9",
+    backgroundColor: "#ffffff",
     padding: 25,
     paddingTop: 60,
   },
   titulo: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#5170ff",
+    color: "#2701A9",
     marginBottom: 25,
   },
   cardsContainer: {
@@ -105,46 +76,35 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   card: {
-    backgroundColor: "#ffffff15",
+    backgroundColor: "#D9D9D9",
     width: "48%",
     padding: 20,
     borderRadius: 12,
     alignItems: "center",
-    borderColor: "#fff5",
-    borderWidth: 1,
+    borderWidth: 2,
+    borderColor: "#ffffff81",
   },
   subtitulo: {
     fontSize: 14,
-    color: "#fff",
+    color: "#000000",
     marginBottom: 6,
+    fontWeight: "bold",
   },
   numero: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#5170ff",
+    color: "#2701A9",
   },
   btnPrincipal: {
-    backgroundColor: "#5170ff",
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: "#2701A9",
+    padding: 14,
+    borderRadius: 30,
     alignItems: "center",
-    marginVertical: 30,
+    marginTop: 30,
   },
   btnText: {
     color: "#fff",
     fontSize: 18,
-    fontWeight: "600",
-  },
-  accesos: {
-    gap: 10,
-  },
-  btnAcceso: {
-    backgroundColor: "#00000070",
-    padding: 15,
-    borderRadius: 10,
-  },
-  accesoText: {
-    color: "#fff",
-    fontSize: 16,
+    fontWeight: "bold",
   },
 });

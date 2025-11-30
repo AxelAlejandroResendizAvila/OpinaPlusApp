@@ -1,83 +1,65 @@
 
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
-import CreateScreen from './CreateScreen';
-import DetailsScreen from './DetailsScreen';
-import HomeAdminScreen from './HomeAdminScreen';
-import HomeUserScreen from './HomeUserScreen';
-import LoginScreen from './LoginScreen';
-import ModScreen from './ModScreen';
-import NotificationsScreen from './NotificationsScreen';
-import RequestScreen from './RequestScreen';
+import React from 'react';
+import { StyleSheet, Text, View, Button, ScrollView } from 'react-native';
 
+export default function TestScreen( {navigation} ) {
 
-export default function TestScreen() {
-    const[screen, setScreen] = useState('menu');
-
-    switch(screen) {
-        case 'Create':
-            return <CreateScreen />;
-        case 'Details':
-            return <DetailsScreen />;
-        case 'HomeAdmin':
-            return <HomeAdminScreen />;
-        case 'HomeUser':
-            return <HomeUserScreen />;
-        case 'Login':
-            return <LoginScreen />;
-        case 'Mod':
-            return <ModScreen />;
-        case 'Notifications':
-            return <NotificationsScreen />;
-        case 'Request':
-            return <RequestScreen />;
-            default:
-                return (
-                    <View style={styles.container}>
-                        <Text style={styles.title}>Opina +</Text>
-                        <Text style={styles.text}>Menu de Screens</Text>
-                        <View style={styles.buttonContainer}>
-                            <Button color="#5170ff" onPress={()=>setScreen('Create')} title='Pantalla Create'/>
-                            <Button color="#5170ff" onPress={()=>setScreen('Details')} title='Pantalla Details'/>
-                            <Button color="#5170ff" onPress={()=>setScreen('HomeAdmin')} title='Pantalla HomeAdmin'/>
-                            <Button color="#5170ff" onPress={()=>setScreen('HomeUser')} title='Pantalla HomeUser'/>
-                            <Button color="#5170ff" onPress={()=>setScreen('Login')} title='Pantalla Login'/>
-                            <Button color="#5170ff" onPress={()=>setScreen('Mod')} title='Pantalla Mod'/>
-                            <Button color="#5170ff" onPress={()=>setScreen('Notifications')} title='Pantalla Notifications'/>
-                            <Button color="#5170ff" onPress={()=>setScreen('Request')} title='Pantalla Request'/>
-                    
-                        </View>
-                    </View>
-                )
-    }
+    return (
+        <View style={styles.container}>
+            <Text style={styles.title}>Opina +</Text>
+            <Text style={styles.text}>Menu de Screens</Text>
+            <ScrollView 
+                style={styles.scrollView}
+                contentContainerStyle={styles.buttonContainer}
+                showsVerticalScrollIndicator={true}
+            >
+                <Button color="#2701A9" onPress={()=>navigation.navigate('Login')} title='Pantalla Login'/>
+                <Button color="#2701A9" onPress={()=>navigation.navigate('Register')} title='Pantalla Register'/>
+                <Button color="#2701A9" onPress={()=>navigation.navigate('RecoverPassword')} title='Pantalla RecoverPassword'/>
+                <Button color="#2701A9" onPress={()=>navigation.navigate('ChangePassword')} title='Pantalla ChangePassword'/>
+                <Button color="#2701A9" onPress={()=>navigation.navigate('HomeUser')} title='Pantalla HomeUser'/>
+                <Button color="#2701A9" onPress={()=>navigation.navigate('HomeAdmin')} title='Pantalla HomeAdmin'/>
+                <Button color="#2701A9" onPress={()=>navigation.navigate('Create')} title='Pantalla Create'/>
+                <Button color="#2701A9" onPress={()=>navigation.navigate('Request')} title='Pantalla Request'/>
+                <Button color="#2701A9" onPress={()=>navigation.navigate('Details')} title='Pantalla Details'/>
+                <Button color="#2701A9" onPress={()=>navigation.navigate('Notifications')} title='Pantalla Notifications'/>
+                <Button color="#2701A9" onPress={()=>navigation.navigate('Mod')} title='Pantalla Mod'/>
+            </ScrollView>
+        </View>
+    )
+    
 }
 
 const styles = StyleSheet.create({
     title: {
-        fontFamily: "monospace", 
-        fontSize: 60, //Tamaño de la letra
-        color: "#ffffffff",
+        fontSize: 36,
+        color: "#2701A9",
+        fontWeight: 'bold',
         textAlign: 'center',
-        marginBottom: 20, //Margen inferior
+        marginBottom: 10,
     },
     text: {
-        fontFamily: "monospace", 
-        fontSize: 40, //Tamaño de la letra
-        color: "#ffffffff",
+        fontSize: 24,
+        color: "#2701A9",
         textAlign: 'center',
-        
+        marginBottom: 20,
+        fontWeight: '600',
     },
     container: {
         flex: 1,
-        backgroundColor: '#000000',
+        backgroundColor: '#ffffff',
         alignItems: 'center',
-        justifyContent: 'center',
+        paddingTop: 50,
+        paddingBottom: 20,
+    },
+    scrollView: {
+        width: '100%',
     },
     buttonContainer: {
-        marginTop: 20, //Margen superior
-        flexDirection: "column", //Alineación vertical
-        justifyContent: "space-between", //Separación entre Details
-        width: "80%",
-        gap: 20,
+        paddingHorizontal: '10%',
+        paddingVertical: 20,
+        flexDirection: "column",
+        alignItems: "stretch",
+        gap: 15,
     },
 })
