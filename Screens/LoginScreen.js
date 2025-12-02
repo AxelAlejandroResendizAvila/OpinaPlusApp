@@ -1,5 +1,7 @@
-import { Text, StyleSheet, View, ImageBackground, Animated, Easing, TouchableOpacity, TextInput, Alert } from 'react-native'
+import { Text, StyleSheet, View, ImageBackground, Animated, Easing, TouchableOpacity, TextInput, Alert, ActivityIndicator, Keyboard, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react';
+import AuthController from '../controllers/AuthController';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginScreen({ navigation }) {
     const [cargando, setCargando] = useState(true);
@@ -7,6 +9,8 @@ export default function LoginScreen({ navigation }) {
     const [contrasenia, setContrasenia] = useState('');
     const [correoLogin, setCorreoLogin] = useState('');
     const [correoError, setCorreoError] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const { login } = useAuth();
 
    const Recuperarla = () => {
     if (navigation) {
@@ -17,39 +21,66 @@ export default function LoginScreen({ navigation }) {
    }
 
     
-    const mostrarAlertaLogin = () => {
+    const mostrarAlertaLogin = async () => {
         const validateCorreo = (correoLogin) => {
-        // Expresión regular básica para validar el formato del correo
-        const CorreoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        // Validar formato y dominios permitidos: @upq.edu.mx o @upq.mx
+        const CorreoRegex = /^[^\s@]+@(upq\.edu\.mx|upq\.mx)$/i;
         if (CorreoRegex.test(correoLogin)) {
           setCorreoError(false);
+          return true;
         } else {
           setCorreoError(true);
+          return false;
         }
       };
-      validateCorreo(correoLogin);
+      
+      // Validaciones básicas
       if(contrasenia.trim() === '' && correoLogin.trim() === ''){    
-        Alert.alert("Error, favor de llenar todos los campos (Móvil)");
-        alert("Favor de llenar todos los campos (Web)");
+        Alert.alert("Error", "Favor de llenar todos los campos");
+        return;
       }else if(contrasenia.trim() === '') {
-        Alert.alert("Error, favor de llenar el campo de la contraseña(Móvil)");
-        alert("Favor de llenar el campo de la contraseña (Web)");
+        Alert.alert("Error", "Favor de llenar el campo de la contraseña");
+        return;
       }else if( correoLogin.trim() === ''){
-        Alert.alert("Error, favor de llenar el campo del correo(Móvil)");
-        alert("Favor de llenar el campo del correo (Web)"); 
-      }else if(correoError){
-         Alert.alert("Error, ingresa un correo valido(Móvil)");
-        alert("Favor de ingresar un correo valido(Web)");
-      }else {
-        // Navegar a HomeUser después del login exitoso
-        if (navigation) {
-          navigation.navigate('HomeUser');
+        Alert.alert("Error", "Favor de llenar el campo del correo");
+        return;
+      }else if(!validateCorreo(correoLogin)){
+        Alert.alert("Error", "Solo se permiten correos institucionales de la UPQ");
+        return;
+      }
+
+      // Intentar login con la BD
+      setLoading(true);
+      try {
+        const resultado = await AuthController.login(correoLogin, contrasenia);
+        
+        if (resultado.success) {
+          // Guardar sesión
+          await login(resultado.data);
+          
+          // Navegar según el rol
+          Alert.alert(
+            "¡Bienvenido!",
+            `Hola ${resultado.data.nombre}`,
+            [{ 
+              text: "OK", 
+              onPress: () => {
+                if (resultado.data.rol === 'admin') {
+                  navigation.replace('HomeAdmin');
+                } else {
+                  navigation.replace('HomeUser');
+                }
+              }
+            }]
+          );
         } else {
-          //Alert para móvil
-          Alert.alert(`Inicio de sesión exitoso`,`correo: ${correoLogin}\nContraseña: ${contrasenia}`);
-          //Alert para web
-          alert(`Inicio de sesión exitoso\ncorreo: ${correoLogin}\nContraseña: ${contrasenia}\n`);
+          Alert.alert("Error", resultado.error || "Credenciales incorrectas");
         }
+      } catch (error) {
+        Alert.alert("Error", "Ocurrió un error al iniciar sesión");
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -82,16 +113,22 @@ export default function LoginScreen({ navigation }) {
 
 
     return (
-        <View style={styles.background}> 
+        <ScrollView 
+            contentContainerStyle={styles.background}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+        > 
           <Text style={styles.titulo}>¡Bienvenido a Opina+!</Text>
             <View style={styles.loginContainer}>
                 
                 <Text style={styles.texto}>Correo</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder='correo@ejemplo.com'
+                    placeholder='correo@upq.edu.mx'
                     value={correoLogin}
                     onChangeText={setCorreoLogin}
+                    keyboardType='email-address'
+                    autoCapitalize='none'
                 /> 
 
                 <Text style={styles.texto}>Contraseña</Text>
@@ -111,8 +148,16 @@ export default function LoginScreen({ navigation }) {
                 
                 <View style={styles.cajaBotones}>
 
-                    <TouchableOpacity style={styles.btnContinuar} onPress={mostrarAlertaLogin}>
-                        <Text style={styles.btnText}>Iniciar Sesión</Text>
+                    <TouchableOpacity 
+                        style={[styles.btnContinuar, loading && styles.btnDisabled]} 
+                        onPress={mostrarAlertaLogin}
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={styles.btnText}>Iniciar Sesión</Text>
+                        )}
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.btn} onPress={() => navigation ? navigation.navigate('Register') : null}>
                         <Text style={styles.btnCancelText}>Registrarse</Text>
@@ -120,7 +165,7 @@ export default function LoginScreen({ navigation }) {
                 </View>
 
             </View>
-        </View>
+        </ScrollView>
     )
 
 }
@@ -186,7 +231,7 @@ etiquetas: {
 input: {
     
     width: '100%', // Ajusta el ancho según sea necesario
-    color:'#ffffffc9',
+    color:'#000000',
     fontWeight: 'bold',
     borderWidth: 2, // Grosor del borde
     borderColor: '#ffffff81', // Color del borde
@@ -236,6 +281,9 @@ btnContinuar: {
     borderRadius: 30,
     alignItems: "center",
     marginTop: 15
+},
+btnDisabled: {
+    backgroundColor: "#6B6B6B",
 },
 btnText: {
     color: "#fff",

@@ -1,14 +1,14 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import HomeUserScreen from './HomeUserScreen';
-import RequestScreen from './RequestScreen';
+import HomeAdminScreen from './HomeAdminScreen';
+import ModScreen from './ModScreen';
 import NotificationsScreen from './NotificationsScreen';
-import ProfileScreen from './ProfileScreen';
+import ProfileAdminScreen from './ProfileAdminScreen';
 
 const Tab = createBottomTabNavigator();
 
-export default function HomeUserTabs() {
+export default function HomeAdminTabs() {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -30,18 +30,18 @@ export default function HomeUserTabs() {
       }}
     >
       <Tab.Screen
-        name="Home"
-        component={HomeUserScreen}
+        name="HomeAdmin"
+        component={HomeAdminScreen}
         options={{
-          tabBarLabel: 'Inicio',
+          tabBarLabel: 'Dashboard',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
+            <Ionicons name="stats-chart" size={size} color={color} />
           ),
         }}
       />
       <Tab.Screen
-        name="Request"
-        component={RequestScreen}
+        name="Mod"
+        component={ModScreen}
         options={{
           tabBarLabel: 'Peticiones',
           tabBarIcon: ({ color, size }) => (
@@ -60,8 +60,8 @@ export default function HomeUserTabs() {
         }}
       />
       <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
+        name="ProfileAdmin"
+        component={ProfileAdminScreen}
         options={{
           tabBarLabel: 'Perfil',
           tabBarIcon: ({ color, size }) => (

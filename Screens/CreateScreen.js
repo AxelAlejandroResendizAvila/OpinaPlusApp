@@ -1,35 +1,56 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, Keyboard, ScrollView } from "react-native";
+import PeticionController from "../controllers/PeticionController";
 
 export default function CreateScreen({ navigation }) {
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [categoria, setCategoria] = useState("");
   const [adjunto, setAdjunto] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const enviarPeticion = () => {
+  const enviarPeticion = async () => {
     if (!titulo.trim() || !descripcion.trim() || !categoria.trim()) {
       Alert.alert("Error", "Todos los campos obligatorios deben llenarse.");
       return;
     }
 
-    if (navigation) {
-      Alert.alert(
-        "Solicitud enviada ✅",
-        `Título: ${titulo}\nCategoría: ${categoria}`,
-        [{ text: "OK", onPress: () => navigation.goBack() }]
-      );
-    } else {
-      Alert.alert(
-        "Solicitud enviada ✅",
-        `Título: ${titulo}\nDescripción: ${descripcion}\nCategoría: ${categoria}\nAdjunto: ${adjunto || "Sin adjunto"}`
-      );
-    }
+    setLoading(true);
 
-    setTitulo("");
-    setDescripcion("");
-    setCategoria("");
-    setAdjunto("");
+    try {
+      const resultado = await PeticionController.crearPeticion({
+        titulo,
+        descripcion,
+        categoria,
+        adjunto
+      });
+
+      if (resultado.success) {
+        Alert.alert(
+          "¡Éxito!",
+          `Petición creada correctamente.\nTítulo: ${titulo}\nCategoría: ${categoria}`,
+          [{ 
+            text: "OK", 
+            onPress: () => {
+              setTitulo("");
+              setDescripcion("");
+              setCategoria("");
+              setAdjunto("");
+              if (navigation) {
+                navigation.goBack();
+              }
+            }
+          }]
+        );
+      } else {
+        Alert.alert("Error", resultado.error || "No se pudo crear la petición");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Ocurrió un error al guardar la petición");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,6 +58,12 @@ export default function CreateScreen({ navigation }) {
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Opina +</Text>
       </View>
+      <ScrollView 
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
       <View style={styles.container}>
         <Text style={styles.title}>Crear Petición</Text>
 
@@ -77,15 +104,31 @@ export default function CreateScreen({ navigation }) {
           onChangeText={setAdjunto}
         />
 
-        <TouchableOpacity style={styles.btn} onPress={enviarPeticion}>
-          <Text style={styles.btnText}>Enviar</Text>
+        <TouchableOpacity 
+          style={[styles.btn, loading && styles.btnDisabled]} 
+          onPress={enviarPeticion}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.btnText}>Enviar</Text>
+          )}
         </TouchableOpacity>
       </View>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    width: '100%',
+  },
+  scrollContent: {
+    alignItems: 'center',
+    paddingBottom: 20,
+  },
   headerContainer: {
     width: '80%',
     padding: 20,
@@ -149,6 +192,9 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 30,
     marginTop: 25,
+  },
+  btnDisabled: {
+    backgroundColor: "#6B6B6B",
   },
   btnText: {
     color: "#fff",

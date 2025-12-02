@@ -1,10 +1,16 @@
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from "react-native";
-import React, { useEffect, useRef } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, Animated, ActivityIndicator, Alert } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import PeticionController from "../controllers/PeticionController";
+import { useAuth } from "../context/AuthContext";
 
 export default function HomeUserScreen({ navigation }) {
 
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
+  const [estadisticas, setEstadisticas] = useState({ abiertas: 0, resueltas: 0 });
+  const [loading, setLoading] = useState(true);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     Animated.spring(scaleAnim, {
@@ -14,26 +20,75 @@ export default function HomeUserScreen({ navigation }) {
     }).start();
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      cargarEstadisticas();
+    }, [])
+  );
+
+  const cargarEstadisticas = async () => {
+    try {
+      setLoading(true);
+      const resultado = await PeticionController.obtenerEstadisticas();
+      if (resultado.success) {
+        setEstadisticas(resultado.data);
+      }
+    } catch (error) {
+      console.error("Error al cargar estadísticas:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Cerrar Sesión",
+      "¿Estás seguro de que deseas cerrar sesión?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Salir",
+          style: "destructive",
+          onPress: async () => {
+            await logout();
+            navigation.replace('Login');
+          }
+        }
+      ]
+    );
+  };
+
   return (
         <View
           style={styles.container}
         >
           <View style={styles.headerContainer}>
                   <Text style={styles.headerText}>Opina +</Text>
+                  <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+                    <Ionicons name="log-out-outline" size={24} color="#2701A9" />
+                  </TouchableOpacity>
                 </View>
-          <Text style={styles.titulo}>Bienvenido, Daniel</Text>
+          <Text style={styles.titulo}>Bienvenido, {user?.nombre || 'Usuario'}</Text>
 
           <Animated.View style={[styles.cardsContainer, { transform: [{ scale: scaleAnim }] }]}>
             <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Request')}>
               <Ionicons name="folder-open" size={40} color="#5170ff" />
               <Text style={styles.subtitulo}>Peticiones Abiertas</Text>
-              <Text style={styles.numero}>4</Text>
+              {loading ? (
+                <ActivityIndicator color="#2701A9" />
+              ) : (
+                <Text style={styles.numero}>{estadisticas.abiertas}</Text>
+              )}
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Request')}>
               <Ionicons name="checkmark-circle" size={40} color="#2cbb77" />
               <Text style={styles.subtitulo}>Peticiones Resueltas</Text>
-              <Text style={styles.numero}>12</Text>
+              {loading ? (
+                <ActivityIndicator color="#2701A9" />
+              ) : (
+                <Text style={styles.numero}>{estadisticas.resueltas}</Text>
+              )}
             </TouchableOpacity>
           </Animated.View>
 
@@ -49,15 +104,19 @@ export default function HomeUserScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    width: '80%',
+    width: '100%',
     paddingBottom: 20,
-   
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   headerText: {
     fontSize: 36,
     fontWeight: "bold",
     color: "#2701A9",
-    
+  },
+  logoutBtn: {
+    padding: 8,
   },
   container: {
     flex: 1,

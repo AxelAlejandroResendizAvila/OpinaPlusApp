@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import AuthController from '../controllers/AuthController';
 
-export default function ProfileScreen({ navigation }) {
+export default function ProfileAdminScreen({ navigation }) {
   const { user, logout, updateUser } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const [nombreEdit, setNombreEdit] = useState(user?.nombre || '');
@@ -35,7 +35,6 @@ export default function ProfileScreen({ navigation }) {
       });
 
       if (resultado.success) {
-        // Actualizar el contexto con los nuevos datos
         await updateUser({ ...user, nombre: nombreEdit.trim() });
         setModalVisible(false);
         Alert.alert("¡Éxito!", "Tu información ha sido actualizada");
@@ -72,24 +71,24 @@ export default function ProfileScreen({ navigation }) {
     );
   };
 
-  const obtenerRolTexto = (rol) => {
-    return rol === 'admin' ? 'Administrador' : 'Usuario';
-  };
-
   return (
     <View style={styles.background}>
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Opina +</Text>
+        <View style={styles.adminBadge}>
+          <Ionicons name="shield-checkmark" size={16} color="#fff" />
+          <Text style={styles.adminBadgeText}>ADMIN</Text>
+        </View>
       </View>
       
       <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
-          <Text style={styles.title}>Mi Perfil</Text>
+          <Text style={styles.title}>Perfil de Administrador</Text>
 
           {/* Foto de perfil */}
           <View style={styles.profileImageContainer}>
             <View style={styles.profileImageWrapper}>
-              <Ionicons name="person-circle" size={120} color="#2701A9" />
+              <Ionicons name="shield" size={100} color="#2701A9" />
             </View>
           </View>
 
@@ -113,11 +112,11 @@ export default function ProfileScreen({ navigation }) {
               </View>
             </View>
 
-            <View style={styles.infoItem}>
-              <Ionicons name="shield-checkmark" size={20} color="#2701A9" style={styles.icon} />
+            <View style={[styles.infoItem, styles.infoItemAdmin]}>
+              <Ionicons name="shield-checkmark" size={20} color="#fff" style={styles.icon} />
               <View style={styles.infoTextContainer}>
-                <Text style={styles.infoLabel}>Rol</Text>
-                <Text style={styles.infoValue}>{obtenerRolTexto(user?.rol)}</Text>
+                <Text style={[styles.infoLabel, { color: '#fff' }]}>Rol</Text>
+                <Text style={[styles.infoValue, { color: '#fff' }]}>Administrador</Text>
               </View>
             </View>
 
@@ -127,6 +126,27 @@ export default function ProfileScreen({ navigation }) {
                 <Text style={styles.infoLabel}>Contraseña</Text>
                 <Text style={styles.infoValue}>••••••••</Text>
               </View>
+            </View>
+          </View>
+
+          {/* Permisos de administrador */}
+          <View style={styles.permissionsSection}>
+            <Text style={styles.sectionTitle}>Permisos de Administrador</Text>
+            <View style={styles.permissionCard}>
+              <Ionicons name="checkmark-circle" size={20} color="#28a745" />
+              <Text style={styles.permissionText}>Gestionar peticiones</Text>
+            </View>
+            <View style={styles.permissionCard}>
+              <Ionicons name="checkmark-circle" size={20} color="#28a745" />
+              <Text style={styles.permissionText}>Ver estadísticas</Text>
+            </View>
+            <View style={styles.permissionCard}>
+              <Ionicons name="checkmark-circle" size={20} color="#28a745" />
+              <Text style={styles.permissionText}>Moderar contenido</Text>
+            </View>
+            <View style={styles.permissionCard}>
+              <Ionicons name="checkmark-circle" size={20} color="#28a745" />
+              <Text style={styles.permissionText}>Acceso completo al sistema</Text>
             </View>
           </View>
 
@@ -227,6 +247,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#2701A9",
   },
+  adminBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2701A9',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 15,
+    marginTop: 8,
+    gap: 4,
+  },
+  adminBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
   scrollContainer: {
     width: '100%',
   },
@@ -247,27 +282,13 @@ const styles = StyleSheet.create({
   profileImageContainer: {
     alignItems: 'center',
     marginBottom: 30,
-    position: 'relative',
   },
   profileImageWrapper: {
-    backgroundColor: '#D9D9D9',
+    backgroundColor: '#E8E3FF',
     borderRadius: 70,
-    padding: 10,
+    padding: 20,
     borderWidth: 3,
     borderColor: '#2701A9',
-  },
-  btnCambiarFoto: {
-    position: 'absolute',
-    bottom: 0,
-    right: '35%',
-    backgroundColor: '#2701A9',
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    borderColor: '#ffffff',
   },
   infoSection: {
     marginBottom: 30,
@@ -288,6 +309,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#ffffff81',
   },
+  infoItemAdmin: {
+    backgroundColor: '#2701A9',
+    borderColor: '#2701A9',
+  },
   icon: {
     marginRight: 15,
   },
@@ -303,6 +328,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000000',
     fontWeight: 'bold',
+  },
+  permissionsSection: {
+    marginBottom: 30,
+  },
+  permissionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E8F5E9',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+    gap: 10,
+  },
+  permissionText: {
+    fontSize: 14,
+    color: '#000',
+    fontWeight: '500',
   },
   actionsSection: {
     gap: 10,

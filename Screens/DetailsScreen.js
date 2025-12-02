@@ -1,18 +1,20 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, TextInput, FlatList, Alert } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Alert, ScrollView } from "react-native";
+import PeticionController from "../controllers/PeticionController";
 
-export default function DetailsScreen({ navigation, rol = "alumno" }) {
+export default function DetailsScreen({ navigation, route, rol = "alumno" }) {
+  const { peticion } = route.params || {};
 
-  const [mensajes, setMensajes] = useState([
-    { id: "1", autor: "Alumno", texto: "Mi salón no tiene aire acondicionado.", fecha: "01/11/2024" },
-    { id: "2", autor: "Moderador", texto: "Se revisará con mantenimiento.", fecha: "02/11/2024" },
-  ]);
-
+  const [mensajes, setMensajes] = useState([]);
   const [nuevoMensaje, setNuevoMensaje] = useState("");
 
-  const estado = "En proceso";
-  const titulo = "Aula sin aire acondicionado";
-  const descripcion = "En el salón B302 el aire acondicionado no funciona desde hace dos semanas. Hace demasiado calor para trabajar bien.";
+  if (!peticion) {
+    return (
+      <View style={styles.background}>
+        <Text style={styles.error}>No se encontró la petición</Text>
+      </View>
+    );
+  }
 
   const enviarMensaje = () => {
     if (nuevoMensaje.trim() === "") {
@@ -31,8 +33,54 @@ export default function DetailsScreen({ navigation, rol = "alumno" }) {
     setNuevoMensaje("");
   };
 
-  const cerrarPeticion = () => {
-    Alert.alert("Petición cerrada", "Has cerrado la solicitud exitosamente.");
+  const cambiarEstado = async (nuevoEstado) => {
+    try {
+      const resultado = await PeticionController.cambiarEstadoPeticion(peticion.id, nuevoEstado);
+      if (resultado.success) {
+        Alert.alert(
+          "Éxito", 
+          resultado.message,
+          [{ text: "OK", onPress: () => navigation.goBack() }]
+        );
+      } else {
+        Alert.alert("Error", resultado.error);
+      }
+    } catch (error) {
+      Alert.alert("Error", "No se pudo cambiar el estado");
+    }
+  };
+
+  const eliminarPeticion = async () => {
+    Alert.alert(
+      "Confirmar eliminación",
+      "¿Estás seguro de que deseas eliminar esta petición?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const resultado = await PeticionController.eliminarPeticion(peticion.id);
+              if (resultado.success) {
+                Alert.alert("Éxito", resultado.message, [
+                  { text: "OK", onPress: () => navigation.goBack() }
+                ]);
+              } else {
+                Alert.alert("Error", resultado.error);
+              }
+            } catch (error) {
+              Alert.alert("Error", "No se pudo eliminar la petición");
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const formatearFecha = (fechaISO) => {
+    const fecha = new Date(fechaISO);
+    return fecha.toLocaleDateString('es-MX');
   };
 
   const MensajeItem = ({ autor, texto, fecha }) => (
@@ -48,25 +96,45 @@ export default function DetailsScreen({ navigation, rol = "alumno" }) {
           <View style={styles.headerContainer}>
             <Text style={styles.headerText}>Opina +</Text>
           </View>
-          <View style={styles.container}>
-            <Text style={styles.titulo}>{titulo}</Text>
+          <ScrollView style={styles.container}>
+            <Text style={styles.titulo}>{peticion.titulo}</Text>
 
         <Text style={styles.sub}>Descripción:</Text>
-        <Text style={styles.descripcion}>{descripcion}</Text>
+        <Text style={styles.descripcion}>{peticion.descripcion}</Text>
+
+        <Text style={styles.sub}>Categoría:</Text>
+        <Text style={styles.descripcion}>{peticion.categoria}</Text>
+
+        {peticion.adjunto && (
+          <>
+            <Text style={styles.sub}>Adjunto:</Text>
+            <Text style={styles.descripcion}>{peticion.adjunto}</Text>
+          </>
+        )}
 
         <Text style={styles.sub}>Estado:</Text>
-        <Text style={styles.estado}>{estado}</Text>
+        <Text style={styles.estado}>
+          {peticion.estado === 'abierta' ? 'Abierta' : 'Resuelta'}
+        </Text>
+
+        <Text style={styles.sub}>Fecha de creación:</Text>
+        <Text style={styles.descripcion}>{formatearFecha(peticion.fecha_creacion)}</Text>
 
         <Text style={styles.sub}>Mensajes:</Text>
 
-        <FlatList
-            data={mensajes}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-            <MensajeItem autor={item.autor} texto={item.texto} fecha={item.fecha} />
-            )}
-            style={{ marginBottom: 15 }}
-        />
+        {mensajes.length > 0 ? (
+          <FlatList
+              data={mensajes}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <MensajeItem autor={item.autor} texto={item.texto} fecha={item.fecha} />
+              )}
+              style={{ marginBottom: 15 }}
+              scrollEnabled={false}
+          />
+        ) : (
+          <Text style={styles.descripcion}>No hay mensajes todavía</Text>
+        )}
 
         <TextInput
             style={styles.input}
@@ -80,12 +148,19 @@ export default function DetailsScreen({ navigation, rol = "alumno" }) {
             <Text style={styles.btnText}>Responder</Text>
         </TouchableOpacity>
 
-        {rol === "alumno" && (
-            <TouchableOpacity style={styles.btnCerrar} onPress={cerrarPeticion}>
-            <Text style={styles.btnText}>Cerrar Petición</Text>
-            </TouchableOpacity>
+        {peticion.estado === 'abierta' && (
+          <TouchableOpacity 
+            style={styles.btnResolver} 
+            onPress={() => cambiarEstado('resuelta')}
+          >
+            <Text style={styles.btnText}>Marcar como Resuelta</Text>
+          </TouchableOpacity>
         )}
-          </View>
+
+        <TouchableOpacity style={styles.btnEliminar} onPress={eliminarPeticion}>
+          <Text style={styles.btnText}>Eliminar Petición</Text>
+        </TouchableOpacity>
+          </ScrollView>
         </View>
   );
 }
@@ -178,15 +253,29 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginBottom: 10,
     },
-    btnCerrar: {
+    btnResolver: {
+        backgroundColor: "#06d6a0",
+        padding: 14,
+        borderRadius: 30,
+        alignItems: "center",
+        marginBottom: 10,
+    },
+    btnEliminar: {
         backgroundColor: "#e63946",
         padding: 14,
         borderRadius: 30,
         alignItems: "center",
+        marginBottom: 20,
     },
     btnText: {
         color: "#fff",
         fontWeight: "bold",
         fontSize: 16,
+    },
+    error: {
+        color: "#e63946",
+        fontSize: 18,
+        textAlign: "center",
+        marginTop: 50,
     },
     });

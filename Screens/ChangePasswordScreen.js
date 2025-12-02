@@ -1,5 +1,7 @@
-import { Text, StyleSheet, View, TouchableOpacity, TextInput, Alert } from 'react-native'
-import React, { useEffect, useState } from 'react';
+import { Text, StyleSheet, View, TouchableOpacity, TextInput, Alert, ActivityIndicator, Keyboard, ScrollView } from 'react-native'
+import React, { useState } from 'react';
+import AuthController from '../controllers/AuthController';
+import { useAuth } from '../context/AuthContext';
 
 export default function ChangePasswordScreen({ navigation }) {
     const [contrasenaActual, setContrasenaActual] = useState('');
@@ -8,8 +10,10 @@ export default function ChangePasswordScreen({ navigation }) {
     const [errorActual, setErrorActual] = useState(false);
     const [errorNueva, setErrorNueva] = useState(false);
     const [errorRepetir, setErrorRepetir] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const { user } = useAuth();
 
-    const cambiarContrasena = () => {
+    const cambiarContrasena = async () => {
         // Reset errors
         setErrorActual(false);
         setErrorNueva(false);
@@ -46,22 +50,55 @@ export default function ChangePasswordScreen({ navigation }) {
             return;
         }
 
-        // Aquí iría la lógica para verificar la contraseña actual y cambiarla
-        // Por ahora simulamos el éxito
-        Alert.alert(
-            "Éxito",
-            "Tu contraseña ha sido actualizada correctamente",
-            [
-                {
-                    text: "OK",
-                    onPress: () => navigation ? navigation.goBack() : null
-                }
-            ]
-        );
+        if (contrasenaActual === nuevaContrasena) {
+            setErrorNueva(true);
+            Alert.alert("Error", "La nueva contraseña debe ser diferente a la actual");
+            return;
+        }
+
+        // Cambiar contraseña en la BD
+        setLoading(true);
+        try {
+            const resultado = await AuthController.cambiarPassword(
+                user.id,
+                contrasenaActual,
+                nuevaContrasena,
+                repetirContrasena
+            );
+
+            if (resultado.success) {
+                Alert.alert(
+                    "¡Éxito!",
+                    "Tu contraseña ha sido actualizada correctamente",
+                    [
+                        {
+                            text: "OK",
+                            onPress: () => {
+                                setContrasenaActual('');
+                                setNuevaContrasena('');
+                                setRepetirContrasena('');
+                                navigation ? navigation.goBack() : null;
+                            }
+                        }
+                    ]
+                );
+            } else {
+                Alert.alert("Error", resultado.error);
+            }
+        } catch (error) {
+            Alert.alert("Error", "Ocurrió un error al cambiar la contraseña");
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <View style={styles.background}>
+        <ScrollView 
+            contentContainerStyle={styles.background}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+        >
             <Text style={styles.titulo}>Cambiar Contraseña</Text>
 
             <View style={styles.loginContainer}>
@@ -116,8 +153,16 @@ export default function ChangePasswordScreen({ navigation }) {
                 )}
 
                 <View style={styles.cajaBotones}>
-                    <TouchableOpacity style={styles.btnContinuar} onPress={cambiarContrasena}>
-                        <Text style={styles.btnText}>Continuar</Text>
+                    <TouchableOpacity 
+                        style={[styles.btnContinuar, loading && styles.btnDisabled]} 
+                        onPress={cambiarContrasena}
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={styles.btnText}>Continuar</Text>
+                        )}
                     </TouchableOpacity>
 
                     <TouchableOpacity 
@@ -128,7 +173,7 @@ export default function ChangePasswordScreen({ navigation }) {
                     </TouchableOpacity>
                 </View>
             </View>
-        </View>
+        </ScrollView>
     );
 }
 
@@ -194,7 +239,7 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '100%',
-        color: '#ffffffc9',
+        color: '#000000',
         fontWeight: 'bold',
         borderWidth: 2,
         borderColor: '#ffffff81',
@@ -232,6 +277,9 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         alignItems: "center",
         marginTop: 15
+    },
+    btnDisabled: {
+        backgroundColor: "#6B6B6B",
     },
     btnText: {
         color: "#fff",

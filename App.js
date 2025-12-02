@@ -1,7 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, ActivityIndicator, View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useEffect, useState } from 'react';
+import { initDatabase } from './database/database';
+import { AuthProvider } from './context/AuthContext';
 
 // Importar pantallas
 import LoginScreen from './Screens/LoginScreen';
@@ -9,7 +12,7 @@ import RegisterScreen from './Screens/RegisterScreen';
 import ChangePasswordScreen from './Screens/ChangePasswordScreen';
 import RecoverPasswordScreen from './Screens/RecoverPasswordScreen';
 import HomeUserTabs from './Screens/HomeUserTabs';
-import HomeAdminScreen from './Screens/HomeAdminScreen';
+import HomeAdminTabs from './Screens/HomeAdminTabs';
 import CreateScreen from './Screens/CreateScreen';
 import RequestScreen from './Screens/RequestScreen';
 import DetailsScreen from './Screens/DetailsScreen';
@@ -20,11 +23,39 @@ import TestScreen from './Screens/TestScreen';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [dbInitialized, setDbInitialized] = useState(false);
+
+  useEffect(() => {
+    const setupDatabase = async () => {
+      try {
+        await initDatabase();
+        setDbInitialized(true);
+        console.log('Base de datos lista');
+      } catch (error) {
+        console.error('Error al configurar la base de datos:', error);
+      }
+    };
+
+    setupDatabase();
+  }, []);
+
+  if (!dbInitialized) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
+        <ActivityIndicator size="large" color="#2701A9" />
+        <Text style={{ marginTop: 20, fontSize: 18, color: '#2701A9', fontWeight: 'bold' }}>
+          Inicializando...
+        </Text>
+      </View>
+    );
+  }
+
   return (
+    <AuthProvider>
     <NavigationContainer>
       <StatusBar style="auto" />
       <Stack.Navigator 
-        initialRouteName="Test"
+        initialRouteName="Login"
         screenOptions={{
           headerStyle: {
             backgroundColor: '#2701A9',
@@ -77,10 +108,10 @@ export default function App() {
         />
         <Stack.Screen 
           name="HomeAdmin" 
-          component={HomeAdminScreen}
+          component={HomeAdminTabs}
           options={{ 
             title: 'Dashboard Admin',
-            headerShown: true 
+            headerShown: false 
           }}
         />
         <Stack.Screen 
@@ -133,6 +164,7 @@ export default function App() {
         />
       </Stack.Navigator>
     </NavigationContainer>
+    </AuthProvider>
   );
 }
 

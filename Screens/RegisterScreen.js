@@ -1,5 +1,6 @@
-import { Text, StyleSheet, View, TouchableOpacity, TextInput, Alert, Switch } from 'react-native'
-import React, { useEffect, useState } from 'react';
+import { Text, StyleSheet, View, TouchableOpacity, TextInput, Alert, Switch, ActivityIndicator, Keyboard, ScrollView } from 'react-native'
+import React, { useState } from 'react';
+import AuthController from '../controllers/AuthController';
 
 export default function RegisterScreen({ navigation }) {
     const [nombre, setNombre] = useState('');
@@ -8,67 +9,91 @@ export default function RegisterScreen({ navigation }) {
     const [correo, setCorreo] = useState('');
     const [esEncendido, cambiarEncendido] = useState(false);
     const [correoError, setCorreoError] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const mostrarAlertaRegistro = () => {
+    const mostrarAlertaRegistro = async () => {
         const validateCorreo = (correo) => {
-            // Expresión regular básica para validar el formato del correo
-            const CorreoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            // Validar formato y dominios permitidos: @upq.edu.mx o @upq.mx
+            const CorreoRegex = /^[^\s@]+@(upq\.edu\.mx|upq\.mx)$/i;
             if (CorreoRegex.test(correo)) {
                 setCorreoError(false);
+                return true;
             } else {
                 setCorreoError(true);
+                return false;
             }
         }
-        validateCorreo(correo);
-        if (nombre.trim() === '' && contrasenia.trim() === '' && correo.trim() === '' && contraseniaConfirm.trim() === '') {
-            Alert.alert("Error, favor de llenar todos los campos (Móvil)");
-            alert("Favor de llenar todos los campos (Web)");
-        } else if (nombre.trim() === '') {
-            Alert.alert("Error, favor de llenar el campo del nombre(Móvil)");
-            alert("Favor de llenar el campo del nombre (Web)");
-        } else if (contrasenia.trim() === '') {
-            Alert.alert("Error, favor de llenar el campo de la contraseña(Móvil)");
-            alert("Favor de llenar el campo de la contraseña (Web)");
-        } else if (contraseniaConfirm.trim() === '') {
-            Alert.alert("Error, favor de llenar el campo de confirmación de la contraseña(Móvil)");
-            alert("Favor de llenar el campo de confirmación de la contraseña (Web)");
-        } else if (correo.trim() === '') {
-            Alert.alert("Error, favor de llenar el campo del correo(Móvil)");
-            alert("Favor de llenar el campo del correo (Web)");
+        
+        // Validaciones básicas
+        if (nombre.trim() === '' || contrasenia.trim() === '' || correo.trim() === '' || contraseniaConfirm.trim() === '') {
+            Alert.alert("Error", "Favor de llenar todos los campos");
+            return;
+        } else if (!validateCorreo(correo)) {
+            Alert.alert("Error", "Solo se permiten correos institucionales:\n• @upq.edu.mx (Estudiantes)\n• @upq.mx (Administradores)");
+            return;
         } else if (esEncendido === false) {
-            Alert.alert("Error, favor de aceptar los términos y condiciones(Móvil)");
-            alert("Favor de aceptar los términos y condiciones(Web)");
+            Alert.alert("Error", "Debes aceptar los términos y condiciones");
+            return;
         } else if (contrasenia !== contraseniaConfirm) {
-            Alert.alert("Error, las contraseñas no coinciden(Móvil)");
-            alert("Las contraseñas no coinciden(Web)");
-        } else if (correoError) {
-            Alert.alert("Error, ingresa un correo valido(Móvil)");
-            alert("Favor de ingresar un correo valido(Web)");
-        } else {
-            // Navegar a Login después del registro exitoso
-            if (navigation) {
+            Alert.alert("Error", "Las contraseñas no coinciden");
+            return;
+        } else if (contrasenia.length < 6) {
+            Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
+            return;
+        }
+
+        // Registrar en la BD
+        setLoading(true);
+        try {
+            const resultado = await AuthController.registrar({
+                nombre,
+                email: correo,
+                password: contrasenia,
+                confirmPassword: contraseniaConfirm
+            });
+
+            if (resultado.success) {
                 Alert.alert(
-                    "Registro exitoso", 
+                    "¡Registro exitoso!", 
                     `Bienvenido ${nombre}! Ahora puedes iniciar sesión.`,
-                    [{ text: "OK", onPress: () => navigation.navigate('Login') }]
+                    [{ 
+                        text: "OK", 
+                        onPress: () => {
+                            // Limpiar formulario
+                            setNombre('');
+                            setCorreo('');
+                            setContrasenia('');
+                            setContraseniaConfirm('');
+                            cambiarEncendido(false);
+                            navigation.navigate('Login');
+                        }
+                    }]
                 );
             } else {
-                //Alert para móvil
-                Alert.alert(`Registro exitoso`, `Nombre: ${nombre}\ncorreo: ${correo}`);
-                //Alert para web
-                alert(`Registro exitoso\nNombre: ${nombre}\ncorreo: ${correo}\n`);
+                Alert.alert("Error", resultado.error || "No se pudo registrar el usuario");
             }
+        } catch (error) {
+            Alert.alert("Error", "Ocurrió un error al registrar");
+            console.error(error);
+        } finally {
+            setLoading(false);
         }
     }
 
     return (
-        <View style={styles.background}>
+        <ScrollView 
+            contentContainerStyle={styles.background}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+        >
             <Text style={styles.titulo}>¡Bienvenido a Opina+!</Text>
             <View style={styles.loginContainer}>
                 <TouchableOpacity>
                     <Text style={styles.etiquetas} onPress={() => navigation ? navigation.goBack() : null}>Volver</Text>
                 </TouchableOpacity>
                 <Text style={styles.titulo}>Registro</Text>
+                
+              
 
                 <TextInput
                     style={styles.input}
@@ -79,9 +104,11 @@ export default function RegisterScreen({ navigation }) {
 
                 <TextInput
                     style={styles.input}
-                    placeholder='correo@ejemplo.com'
+                    placeholder='correo@upq.edu.mx o correo@upq.mx'
                     value={correo}
                     onChangeText={setCorreo}
+                    keyboardType='email-address'
+                    autoCapitalize='none'
                 />
 
                 <TextInput
@@ -110,11 +137,19 @@ export default function RegisterScreen({ navigation }) {
 
                     </Switch>
                 </View>
-                <TouchableOpacity style={styles.btnContinuar} onPress={mostrarAlertaRegistro}>
-                    <Text style={styles.btnText}>Continuar</Text>
+                <TouchableOpacity 
+                    style={[styles.btnContinuar, loading && styles.btnDisabled]} 
+                    onPress={mostrarAlertaRegistro}
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <ActivityIndicator color="#fff" />
+                    ) : (
+                        <Text style={styles.btnText}>Continuar</Text>
+                    )}
                 </TouchableOpacity>
             </View>
-        </View>
+        </ScrollView>
     )
 }
 
@@ -165,6 +200,16 @@ const styles = StyleSheet.create({
         fontWeight: 'bold', // Negrita para el título
         marginBottom: 20, // Espacio debajo del título
     },
+    infoText: {
+        fontSize: 12,
+        color: '#2701A9',
+        backgroundColor: '#E8E3FF',
+        padding: 10,
+        borderRadius: 8,
+        marginBottom: 15,
+        textAlign: 'left',
+        lineHeight: 18,
+    },
     etiquetas: {
         fontSize: 12, // Tamaño de fuente más grande para las etiquetas
         color: '#000000e0', // Color blanco para las etiquetas
@@ -175,7 +220,7 @@ const styles = StyleSheet.create({
     input: {
 
         width: '100%', // Ajusta el ancho según sea necesario
-        color: '#ffffffc9',
+        color: '#000000',
         fontWeight: 'bold',
         borderWidth: 2, // Grosor del borde
         borderColor: '#ffffff81', // Color del borde
@@ -225,6 +270,9 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         alignItems: "center",
         marginTop: 15
+    },
+    btnDisabled: {
+        backgroundColor: "#6B6B6B",
     },
     btnText: {
         color: "#fff",
