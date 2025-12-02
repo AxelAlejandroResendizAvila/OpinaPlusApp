@@ -240,16 +240,7 @@ export default function HomeAdminScreen({ navigation }) {
         >
           <Text style={styles.titulo}>Dashboard Administrador</Text>
 
-          {/* Botón temporal de DEBUG */}
-          {estadisticas.total < 10 && (
-            <TouchableOpacity 
-              style={styles.btnDebug} 
-              onPress={crearPeticionesPrueba}
-            >
-              <Ionicons name="flask" size={20} color="#fff" />
-              <Text style={styles.btnDebugText}>Crear 30 Peticiones de Prueba</Text>
-            </TouchableOpacity>
-          )}
+         
 
       {/* KPIs */}
       <View style={styles.cardRow}>
@@ -304,7 +295,7 @@ export default function HomeAdminScreen({ navigation }) {
       <Barra porcentaje={porcentajeCerradas} color="#6c757d" />
 
       {/* Sección Machine Learning */}
-      <Text style={styles.subtitle}> Inteligencia Artificial</Text>
+      <Text style={styles.subtitle}> Modelo ml </Text>
 
       {mlLoading && (
         <View style={styles.mlLoadingContainer}>
