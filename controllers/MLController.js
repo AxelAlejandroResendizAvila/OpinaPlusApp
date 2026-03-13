@@ -10,7 +10,7 @@ class MLController {
   // - Desarrollo local (Android Emulator): http://10.0.2.2:8000/api
   // - Desarrollo local (dispositivo físico): http://TU_IP_LOCAL:8000/api (ej: http://192.168.1.100:8000/api)
   // - Producción: https://tu-dominio.com/api
-  static API_URL = 'http://192.168.0.7:8000/api';
+  static API_URL = 'http://10.16.34.179:8000/api';
 
   /**
    * Verifica el estado de la API
