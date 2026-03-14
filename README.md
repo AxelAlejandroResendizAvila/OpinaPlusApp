@@ -1,18 +1,22 @@
 # OpinaPlus 🗳️
 
-**OpinaPlus** is a mobile and web platform designed to centralize the management of petitions and suggestions within an academic community.
+OpinaPlus is a **mobile and web platform for managing petitions and suggestions within an academic community**.
 
-The application allows users to submit requests and track their status, while administrators can monitor, moderate, and manage them through a dashboard.
+The application allows users to submit requests and track their progress, while administrators can review, moderate, and update their status through an administrative dashboard.
 
-The system also integrates a **Machine Learning module** that analyzes sentiment in user submissions and provides predictive insights to support administrative decision-making.
+The platform integrates a **Machine Learning module** that performs sentiment analysis and predicts the volume of future requests to support data-driven decision making.
 
 ---
 
 # 🎯 Problem
 
-In many academic institutions, petitions and suggestions are handled through **disorganized manual processes**, making it difficult to track requests, measure trends, and provide timely responses.
+In many academic institutions, petitions and suggestions are handled through informal or manual processes, which makes it difficult to:
 
-OpinaPlus solves this problem by providing a **centralized digital platform** where requests can be submitted, managed, and analyzed efficiently.
+* track request progress
+* identify trends in community feedback
+* manage requests efficiently
+
+OpinaPlus provides a **centralized digital system** where requests can be submitted, tracked, and analyzed.
 
 ---
 
@@ -21,98 +25,102 @@ OpinaPlus solves this problem by providing a **centralized digital platform** wh
 ## User Features
 
 * User registration and login
-* Role-based access control using institutional email domains
-* Submit petitions and suggestions
-* Track request status
-* Receive notifications about updates
+* Role-based access control
+* Create petitions and suggestions
+* View request status
+* Receive notifications
 
 ## Administrator Features
 
 * Administrative dashboard
-* View all requests
-* Change request status:
+* View all petitions
+* Update request status:
 
   * Open
   * In progress
   * Resolved
   * Closed
-* Moderate and follow up on requests
-* View statistics and insights
+* Filter requests by status
+* View operational statistics
 
 ---
 
 # 🤖 Machine Learning Module
 
-OpinaPlus integrates a **Python-based Machine Learning service** that provides additional insights for administrators.
+The system integrates a **Python Machine Learning service** located in the `backend-ml` module.
 
-Features include:
+Capabilities include:
 
-* **Sentiment analysis** on petitions (positive, neutral, negative)
-* **Prediction of request volume**
-* Analytical insights displayed in the admin dashboard
+* **Sentiment analysis**
 
-The ML service is implemented using **FastAPI** and communicates with the application via REST APIs.
+  * Classifies petitions as positive, neutral, or negative
+* **Request volume prediction**
+
+  * Estimates future demand trends
+* Provides analytical insights for administrators
+
+The ML service is exposed via a **FastAPI REST API** and consumed by the frontend.
 
 ---
 
-# 🛠 Technologies Used
+# 🛠 Technologies
 
-### Frontend
+## Frontend
 
 * React Native
 * Expo
 * React Navigation
 * Context API
 
-### Backend / APIs
+## Backend / Machine Learning
 
+* Python
 * FastAPI
-* REST API communication
 
-### Database
+## Database
 
 * SQLite (expo-sqlite)
 
-### Machine Learning
+## Data Processing
 
-* Python
-* Sentiment analysis models
-* Predictive analytics
+* Python preprocessing pipeline
+* Sentiment analysis model
+* Volume prediction model
 
 ---
 
-# 🏗 Architecture
+# 🏗 Project Structure
 
-The project follows a **layered architecture** to separate responsibilities and improve maintainability.
-
-```id="arch1"
-Screens/       → UI components and navigation
-Controllers/   → Business logic and request handling
-Models/        → Data models
-Context/       → Global state management (authentication)
-Database/      → SQLite database access
+```id="struct1"
+OpinaPlusApp
+│
+├── screens/          UI screens (login, admin dashboard, petitions)
+├── controllers/      Business logic
+├── models/           Data models
+├── context/          Global state management
+├── database/         SQLite database logic
+│
+├── backend-ml/
+│   ├── models/
+│   │   ├── sentiment_model.py
+│   │   └── volume_predictor.py
+│   ├── utils/
+│   │   ├── preprocessing.py
+│   │   └── database.py
+│   └── app_simple.py
 ```
 
 ---
 
 # 🔗 Frontend–ML Integration
 
-The mobile application communicates with the Machine Learning service through **REST APIs**.
+The mobile application communicates with the Machine Learning backend through **REST API requests**.
 
-Key characteristics:
+Key aspects:
 
-* API requests using `fetch`
-* Error handling when ML service is unavailable
-* Fallback mechanisms to maintain application functionality
-
----
-
-# 📊 Additional Features
-
-* Filters for request status
-* Operational statistics
-* Loading states and UI feedback
-* Cross-platform UX for mobile and web
+* API requests handled with `fetch`
+* Error handling if ML service is unavailable
+* Fallback behavior to keep the app functional
 
 ---
 
@@ -120,55 +128,52 @@ Key characteristics:
 
 Clone the repository:
 
-```bash id="install1"
+```bash id="clone1"
 git clone https://github.com/YOUR_USERNAME/OpinaPlus.git
 ```
 
-Install dependencies:
+Install frontend dependencies:
 
-```bash id="install2"
+```bash id="install_front"
 npm install
 ```
 
 Start the Expo development server:
 
-```bash id="install3"
+```bash id="run_front"
 npx expo start
 ```
 
-Run the application using **Expo Go** or an emulator.
+Run the app using **Expo Go** or an emulator.
 
 ---
 
-# 🧪 Machine Learning Service
+# 🧪 Running the Machine Learning Service
 
-The ML module runs separately as a **FastAPI service**.
-
-Example startup:
+Navigate to the ML backend:
 
 ```bash id="ml1"
-uvicorn main:app --reload
+cd backend-ml
 ```
 
-The mobile application communicates with the ML service through REST endpoints.
+Install dependencies:
+
+```bash id="ml2"
+pip install -r requirements.txt
+```
+
+Start the API server:
+
+```bash id="ml3"
+uvicorn app_simple:app --reload
+```
 
 ---
 
-# 🚀 Future Improvements
+# 📊 Possible Improvements
 
 * Cloud database integration
-* Real-time notifications
+* Push notifications
 * Improved analytics dashboard
-* Enhanced machine learning models
-* Role management expansion
-
----
-
-# 👨‍💻 Project Context
-
-This project was developed as part of an academic initiative to explore:
-
-* Mobile application development
-* Machine learning integration
-* API-based architectures
-* Data analysis for decision support
+* Model retraining pipeline
+* Advanced moderation tools
