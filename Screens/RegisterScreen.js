@@ -53,23 +53,33 @@ export default function RegisterScreen({ navigation }) {
             });
 
             if (resultado.success) {
+                console.log('[RegisterScreen] Registro exitoso');
                 Alert.alert(
                     "¡Registro exitoso!", 
                     `Bienvenido ${nombre}! Ahora puedes iniciar sesión.`,
                     [{ 
                         text: "OK", 
                         onPress: () => {
+                            console.log('[RegisterScreen] Navegando a Login...');
                             // Limpiar formulario
                             setNombre('');
                             setCorreo('');
                             setContrasenia('');
                             setContraseniaConfirm('');
                             cambiarEncendido(false);
-                            navigation.navigate('Login');
+                            
+                            // Navegar
+                            if (navigation) {
+                                console.log('[RegisterScreen] Navigation disponible, navegando...');
+                                navigation.navigate('Login');
+                            } else {
+                                console.error('[RegisterScreen] Navigation no está disponible');
+                            }
                         }
                     }]
                 );
             } else {
+                console.log('[RegisterScreen] Error en registro:', resultado.error);
                 Alert.alert("Error", resultado.error || "No se pudo registrar el usuario");
             }
         } catch (error) {

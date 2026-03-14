@@ -57,14 +57,31 @@ class UserModel {
   static async findByEmail(email) {
     try {
       const db = getDatabase();
+      // Buscar case-insensitive usando LOWER()
       const usuario = await db.getFirstAsync(
-        'SELECT * FROM usuarios WHERE email = ?',
+        'SELECT * FROM usuarios WHERE LOWER(email) = LOWER(?)',
         [email]
       );
+      console.log(`[UserModel.findByEmail] Buscando: "${email}" - Resultado:`, usuario ? 'ENCONTRADO' : 'NO ENCONTRADO');
       return usuario;
     } catch (error) {
       console.error('Error al buscar usuario por email:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Obtiene todos los usuarios (para debugging)
+   */
+  static async getAllUsers() {
+    try {
+      const db = getDatabase();
+      const usuarios = await db.getAllAsync('SELECT id, email, nombre, rol FROM usuarios');
+      console.log('[UserModel.getAllUsers] Usuarios en BD:', usuarios);
+      return usuarios;
+    } catch (error) {
+      console.error('Error al obtener usuarios:', error);
+      return [];
     }
   }
 

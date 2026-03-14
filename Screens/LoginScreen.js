@@ -1,5 +1,6 @@
 import { Text, StyleSheet, View, ImageBackground, Animated, Easing, TouchableOpacity, TextInput, Alert, ActivityIndicator, Keyboard, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react';
+import { CommonActions } from '@react-navigation/native';
 import AuthController from '../controllers/AuthController';
 import { useAuth } from '../context/AuthContext';
 
@@ -20,7 +21,6 @@ export default function LoginScreen({ navigation }) {
     }
    }
 
-    
     const mostrarAlertaLogin = async () => {
         const validateCorreo = (correoLogin) => {
         // Validar formato y dominios permitidos: @upq.edu.mx o @upq.mx
@@ -53,32 +53,33 @@ export default function LoginScreen({ navigation }) {
       setLoading(true);
       try {
         const resultado = await AuthController.login(correoLogin, contrasenia);
+        console.log('[LoginScreen] Resultado del login:', resultado);
         
         if (resultado.success) {
+          console.log('[LoginScreen] Login exitoso');
+          console.log('[LoginScreen] Datos del usuario:', resultado.data);
+          console.log('[LoginScreen] Rol:', resultado.data.rol);
+          
           // Guardar sesión
           await login(resultado.data);
+          console.log('[LoginScreen] Sesión guardada');
           
-          // Navegar según el rol
-          Alert.alert(
-            "¡Bienvenido!",
-            `Hola ${resultado.data.nombre}`,
-            [{ 
-              text: "OK", 
-              onPress: () => {
-                if (resultado.data.rol === 'admin') {
-                  navigation.replace('HomeAdmin');
-                } else {
-                  navigation.replace('HomeUser');
-                }
-              }
-            }]
+          const destino = resultado.data.rol === 'admin' ? 'HomeAdmin' : 'HomeUser';
+          console.log('[LoginScreen] Navegando a:', destino);
+
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: destino }],
+            })
           );
         } else {
+          console.log('[LoginScreen] Login falló:', resultado.error);
           Alert.alert("Error", resultado.error || "Credenciales incorrectas");
         }
       } catch (error) {
+        console.error('[LoginScreen] Error:', error);
         Alert.alert("Error", "Ocurrió un error al iniciar sesión");
-        console.error(error);
       } finally {
         setLoading(false);
       }

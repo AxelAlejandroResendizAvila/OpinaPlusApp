@@ -29,10 +29,16 @@ class AuthController {
       }
 
       // Verificar si el email ya existe
-      const usuarioExistente = await UserModel.findByEmail(email.toLowerCase().trim());
+      const emailLimpio = email.toLowerCase().trim();
+      console.log(`[AuthController] Buscando si existe email: "${emailLimpio}"`);
+      const usuarioExistente = await UserModel.findByEmail(emailLimpio);
+      
       if (usuarioExistente) {
+        console.log(`[AuthController] Email encontrado:`, usuarioExistente);
         throw new Error('El email ya está registrado');
       }
+      
+      console.log(`[AuthController] Email disponible, procediendo a crear usuario`);
 
       // Determinar rol según dominio del email
       const rol = this.determinarRol(email);
