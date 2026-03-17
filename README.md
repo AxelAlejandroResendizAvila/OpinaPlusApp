@@ -129,7 +129,7 @@ Key aspects:
 Clone the repository:
 
 ```bash id="clone1"
-git clone https://github.com/YOUR_USERNAME/OpinaPlus.git
+git clone https://github.com/AxelAlejandroResendizAvila/OpinaPlusApp
 ```
 
 Install frontend dependencies:
